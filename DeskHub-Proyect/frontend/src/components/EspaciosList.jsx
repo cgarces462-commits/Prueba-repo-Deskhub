@@ -1,36 +1,42 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../services/api';
 import { esGestion, esSuperAdmin } from '../utils/roles';
+import { etiquetaTipo, formatoPrecio } from '../utils/catalogos';
 import {
-  TIPOS_ESPACIO,
-  etiquetaTipo,
-  formatoPrecio,
-} from '../utils/catalogos';
+  IconBuilding,
+  IconCalendar,
+  IconClock,
+  IconConference,
+  IconDesktop,
+  IconEdit,
+  IconMapPin,
+  IconPlus,
+  IconTrash,
+  IconUsers,
+} from './Icons';
 import SearchBar from './SearchBar';
-import Campo from './Campo';
+import EspacioModal from './EspacioModal';
+import ReservaModal from './ReservaModal';
 
-const FORM_VACIO = {
-  nombre: '',
-  tipo: 'escritorio',
-  ubicacion: '',
-  capacidad: 1,
-  precioPorHora: 0,
-  descripcion: '',
+const ICONOS_TIPO = {
+  escritorio: IconDesktop,
+  oficina_privada: IconBuilding,
+  sala_reunion: IconConference,
+  sala_conferencia: IconConference,
 };
 
 export default function EspaciosList({ sesion }) {
   const rol = sesion.role?.nombre;
   const puedeGestionar = esGestion(rol);
+  const esSuper = esSuperAdmin(rol);
 
   const [espacios, setEspacios] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
   const [busqueda, setBusqueda] = useState('');
 
-  const [mostrarForm, setMostrarForm] = useState(false);
-  const [form, setForm] = useState(FORM_VACIO);
-  const [creando, setCreando] = useState(false);
-  const [errorForm, setErrorForm] = useState('');
+  const [modalEspacio, setModalEspacio] = useState(null);
+  const [modalReserva, setModalReserva] = useState(null);
 
   async function cargar() {
     setCargando(true);
@@ -59,39 +65,18 @@ export default function EspaciosList({ sesion }) {
     );
   }, [espacios, busqueda]);
 
-  function manejarCambio(e) {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+  function abrirNuevo() {
+    setModalEspacio({ modo: 'crear' });
   }
 
-  async function crear(e) {
-    e.preventDefault();
-    setErrorForm('');
-    if (!form.nombre.trim()) {
-      setErrorForm('El nombre es obligatorio');
-      return;
-    }
-    setCreando(true);
-    try {
-      await api.crearEspacio({
-        ...form,
-        capacidad: Number(form.capacidad) || 1,
-        precioPorHora: Number(form.precioPorHora) || 0,
-      });
-      setForm(FORM_VACIO);
-      setMostrarForm(false);
-      await cargar();
-    } catch (err) {
-      setErrorForm(err.message);
-    } finally {
-      setCreando(false);
-    }
+  function abrirEditar(espacio) {
+    setModalEspacio({ modo: 'editar', espacio });
   }
 
-  async function eliminar(id) {
-    if (!confirm('¿Eliminar este espacio?')) return;
+  async function eliminar(espacio) {
+    if (!confirm(`¿Eliminar el espacio "${espacio.nombre}"?`)) return;
     try {
-      await api.eliminarEspacio(id);
+      await api.eliminarEspacio(espacio.id);
       await cargar();
     } catch (err) {
       setError(err.message);
@@ -101,74 +86,18 @@ export default function EspaciosList({ sesion }) {
   return (
     <section className="vista">
       <div className="vista-encabezado">
-        <h2>Espacios</h2>
+        <div>
+          <h2>Espacios de trabajo</h2>
+          <p className="vista-sub">Encuentra el espacio ideal para tu equipo</p>
+        </div>
         {puedeGestionar && (
-          <button
-            type="button"
-            className="boton primario"
-            onClick={() => setMostrarForm((v) => !v)}
-          >
-            {mostrarForm ? 'Cancelar' : 'Nuevo espacio'}
+          <button type="button" className="boton primario" onClick={abrirNuevo}>
+            <IconPlus className="icon" /> Nuevo espacio
           </button>
         )}
       </div>
 
       {error && <div className="alerta error">{error}</div>}
-
-      {mostrarForm && (
-        <form className="tarjeta formulario" onSubmit={crear}>
-          {errorForm && <div className="alerta error">{errorForm}</div>}
-          <Campo
-            label="Nombre"
-            name="nombre"
-            value={form.nombre}
-            onChange={manejarCambio}
-            placeholder="Sala Zen"
-          />
-          <Campo label="Tipo" name="tipo">
-            <select name="tipo" value={form.tipo} onChange={manejarCambio}>
-              {TIPOS_ESPACIO.map((t) => (
-                <option key={t.valor} value={t.valor}>
-                  {t.etiqueta}
-                </option>
-              ))}
-            </select>
-          </Campo>
-          <Campo
-            label="Ubicación"
-            name="ubicacion"
-            value={form.ubicacion}
-            onChange={manejarCambio}
-            placeholder="Piso 2"
-          />
-          <Campo
-            label="Capacidad"
-            name="capacidad"
-            type="number"
-            min="1"
-            value={form.capacidad}
-            onChange={manejarCambio}
-          />
-          <Campo
-            label="Precio por hora"
-            name="precioPorHora"
-            type="number"
-            min="0"
-            value={form.precioPorHora}
-            onChange={manejarCambio}
-          />
-          <Campo
-            label="Descripción"
-            name="descripcion"
-            value={form.descripcion}
-            onChange={manejarCambio}
-            placeholder="Descripción breve"
-          />
-          <button type="submit" className="boton primario" disabled={creando}>
-            {creando ? 'Guardando...' : 'Guardar espacio'}
-          </button>
-        </form>
-      )}
 
       <SearchBar
         valor={busqueda}
@@ -177,36 +106,104 @@ export default function EspaciosList({ sesion }) {
       />
 
       {cargando ? (
-        <p className="estado">Cargando espacios...</p>
+        <div className="vacio">
+          <div className="spinner" />
+          <p className="estado">Cargando espacios...</p>
+        </div>
       ) : filtrados.length === 0 ? (
-        <p className="estado">No se encontraron resultados</p>
+        <div className="vacio">
+          <h3>Sin resultados</h3>
+          <p>Aún no hay espacios o tu búsqueda no coincidió.</p>
+        </div>
       ) : (
         <div className="grid">
-          {filtrados.map((esp) => (
-            <article key={esp.id} className="tarjeta espacio">
-              <header>
-                <h3>{esp.nombre}</h3>
-                <span className={`badge ${esp.disponible ? 'ok' : 'off'}`}>
-                  {esp.disponible ? 'Disponible' : 'No disponible'}
-                </span>
-              </header>
-              <p className="meta">{etiquetaTipo(esp.tipo)}</p>
-              {esp.ubicacion && <p className="meta">{esp.ubicacion}</p>}
-              <p className="meta">Capacidad: {esp.capacidad} personas</p>
-              <p className="precio">{formatoPrecio(esp.precioPorHora)} / hora</p>
-              {esp.descripcion && <p className="descripcion">{esp.descripcion}</p>}
-              {esSuperAdmin(rol) && (
-                <button
-                  type="button"
-                  className="boton peligro"
-                  onClick={() => eliminar(esp.id)}
-                >
-                  Eliminar
-                </button>
-              )}
-            </article>
-          ))}
+          {filtrados.map((esp) => {
+            const Icono = ICONOS_TIPO[esp.tipo] || IconBuilding;
+            return (
+              <article key={esp.id} className="tarjeta espacio">
+                <header className="espacio-header">
+                  <span className={`espacio-icono espacio-icono-${esp.tipo}`}>
+                    <Icono className="icon" />
+                  </span>
+                  <span className={`badge ${esp.disponible ? 'ok' : 'off'}`}>
+                    {esp.disponible ? 'Disponible' : 'No disponible'}
+                  </span>
+                </header>
+
+                <h3 className="espacio-nombre">{esp.nombre}</h3>
+                <p className="meta espacio-tipo">{etiquetaTipo(esp.tipo)}</p>
+
+                <div className="espacio-caracteristicas">
+                  {esp.ubicacion && (
+                    <span className="meta">
+                      <IconMapPin className="icon" /> {esp.ubicacion}
+                    </span>
+                  )}
+                  <span className="meta">
+                    <IconUsers className="icon" /> {esp.capacidad} personas
+                  </span>
+                  {esp.descripcion && (
+                    <span className="meta">
+                      <IconClock className="icon" /> {esp.descripcion}
+                    </span>
+                  )}
+                </div>
+
+                <div className="espacio-precio">{formatoPrecio(esp.precioPorHora)} <small>/ hora</small></div>
+
+                <footer className="espacio-acciones">
+                  {esp.disponible && (
+                    <button
+                      type="button"
+                      className="boton primario"
+                      onClick={() => setModalReserva(esp)}
+                    >
+                      <IconCalendar className="icon" /> Reservar
+                    </button>
+                  )}
+                  {puedeGestionar && (
+                    <button
+                      type="button"
+                      className="boton secundario"
+                      onClick={() => abrirEditar(esp)}
+                      aria-label={`Editar ${esp.nombre}`}
+                    >
+                      <IconEdit className="icon" /> Editar
+                    </button>
+                  )}
+                  {esSuper && (
+                    <button
+                      type="button"
+                      className="boton peligro icono"
+                      onClick={() => eliminar(esp)}
+                      aria-label={`Eliminar ${esp.nombre}`}
+                    >
+                      <IconTrash className="icon" />
+                    </button>
+                  )}
+                </footer>
+              </article>
+            );
+          })}
         </div>
+      )}
+
+      {modalEspacio && (
+        <EspacioModal
+          isOpen
+          espacioAEditar={modalEspacio.modo === 'editar' ? modalEspacio.espacio : null}
+          onCerrar={() => setModalEspacio(null)}
+          onGuardado={cargar}
+        />
+      )}
+
+      {modalReserva && (
+        <ReservaModal
+          isOpen
+          espacio={modalReserva}
+          onCerrar={() => setModalReserva(null)}
+          onReservaExitosa={cargar}
+        />
       )}
     </section>
   );

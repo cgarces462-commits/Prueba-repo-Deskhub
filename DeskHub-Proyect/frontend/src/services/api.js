@@ -67,6 +67,8 @@ export const api = {
 
   espacios: (filtros = '') => pedir(`/spaces${filtros}`),
   crearEspacio: (datos) => pedir('/spaces', { method: 'POST', body: datos }),
+  editarEspacio: (id, datos) =>
+    pedir(`/spaces/${id}`, { method: 'PUT', body: datos }),
   eliminarEspacio: (id) => pedir(`/spaces/${id}`, { method: 'DELETE' }),
 
   reservas: () => pedir('/reservations'),

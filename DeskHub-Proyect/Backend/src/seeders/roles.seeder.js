@@ -38,12 +38,69 @@ async function seedSuperAdmin() {
   }
 }
 
+const USUARIOS_PRUEBA = [
+  {
+    rol: ROLES.ADMIN,
+    nombre: 'Admin',
+    apellido: 'DeskHub',
+    email: 'admin@deskhub.com',
+    password: 'Admin123',
+  },
+  {
+    rol: ROLES.RECEPCIONISTA,
+    nombre: 'Recep',
+    apellido: 'DeskHub',
+    email: 'recepcionista@deskhub.com',
+    password: 'Recepcionista123',
+  },
+  {
+    rol: ROLES.CLIENTE,
+    nombre: 'Cliente',
+    apellido: 'DeskHub',
+    email: 'cliente@deskhub.com',
+    password: 'Cliente123',
+  },
+  {
+    rol: ROLES.INVITADO,
+    nombre: 'Invitado',
+    apellido: 'DeskHub',
+    email: 'invitado@deskhub.com',
+    password: 'Invitado123',
+  },
+];
+
+async function seedUsuariosPrueba() {
+  for (const datos of USUARIOS_PRUEBA) {
+    const existente = await User.findOne({ where: { email: datos.email } });
+    if (existente) {
+      console.log(`ℹ ${datos.email} ya existía, no se duplicó.`);
+      continue;
+    }
+    const rol = await Role.findOne({ where: { nombre: datos.rol } });
+    if (!rol) {
+      console.log(`✘ Rol ${datos.rol} no encontrado, se omite ${datos.email}.`);
+      continue;
+    }
+    await User.create({
+      nombre: datos.nombre,
+      apellido: datos.apellido,
+      email: datos.email,
+      password: await hashPassword(datos.password),
+      roleId: rol.id,
+    });
+    console.log(
+      `✔ Usuario ${datos.rol} creado -> email: ${datos.email} / password: ${datos.password}`
+    );
+  }
+}
+
 async function run() {
   try {
     await sequelize.authenticate();
     await sequelize.sync();
     await seedRoles();
     await seedSuperAdmin();
+    await seedUsuariosPrueba();
     console.log('Seed completado con éxito.');
   } catch (error) {
     console.error('Error al ejecutar el seed:', error.message);
@@ -56,4 +113,4 @@ if (require.main === module) {
   run();
 }
 
-module.exports = { seedRoles, seedSuperAdmin };
+module.exports = { seedRoles, seedSuperAdmin, seedUsuariosPrueba };

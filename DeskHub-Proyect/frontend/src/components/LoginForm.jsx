@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { api, guardarSesion } from '../services/api';
 import { validarLogin, hayErrores } from '../utils/validacion';
 import Campo from './Campo';
+import AuthLayout from './AuthLayout';
 
 export default function LoginForm({ onLogin, irARegistro, aviso }) {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -36,46 +37,52 @@ export default function LoginForm({ onLogin, irARegistro, aviso }) {
   }
 
   return (
-    <div className="auth">
-      <form className="tarjeta auth-tarjeta" onSubmit={manejarEnvio} noValidate>
-        <h1>DeskHub</h1>
-        <p className="subtitulo">Inicia sesión para reservar espacios</p>
+    <AuthLayout
+      titulo="Bienvenido de nuevo"
+      subtitulo="Inicia sesión para reservar espacios"
+    >
+      {aviso && <div className="alerta exito">{aviso}</div>}
+      {errorServidor && <div className="alerta error">{errorServidor}</div>}
 
-        {aviso && <div className="alerta exito">{aviso}</div>}
-        {errorServidor && <div className="alerta error">{errorServidor}</div>}
+      <form onSubmit={manejarEnvio} noValidate>
+        <div className="campos">
+          <Campo
+            label="Email"
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={manejarCambio}
+            error={errores.email}
+            placeholder="tu@email.com"
+            autoComplete="email"
+          />
+          <Campo
+            label="Contraseña"
+            name="password"
+            type="password"
+            value={form.password}
+            onChange={manejarCambio}
+            error={errores.password}
+            placeholder="••••••••"
+            autoComplete="current-password"
+          />
+        </div>
 
-        <Campo
-          label="Email"
-          name="email"
-          type="email"
-          value={form.email}
-          onChange={manejarCambio}
-          error={errores.email}
-          placeholder="tu@email.com"
-          autoComplete="email"
-        />
-        <Campo
-          label="Contraseña"
-          name="password"
-          type="password"
-          value={form.password}
-          onChange={manejarCambio}
-          error={errores.password}
-          placeholder="••••••••"
-          autoComplete="current-password"
-        />
-
-        <button type="submit" className="boton primario" disabled={enviando}>
+        <button type="submit" className="boton primario block" disabled={enviando}>
           {enviando ? 'Ingresando...' : 'Ingresar'}
         </button>
 
         <p className="pie">
-          ¿No tienes cuenta?{' '}
+          ¿Aún no tienes cuenta?{' '}
           <button type="button" className="enlace" onClick={irARegistro}>
-            Regístrate
+            Regístrate gratis
           </button>
         </p>
+
+        <div className="aviso-demo">
+          <strong>Cuenta de prueba:</strong> superadmin@deskhub.com · SuperAdmin123
+        </div>
       </form>
-    </div>
+    </AuthLayout>
   );
 }

@@ -24,6 +24,7 @@ export default function ReservasList({ sesion }) {
   const [form, setForm] = useState(FORM_VACIO);
   const [creando, setCreando] = useState(false);
   const [errorForm, setErrorForm] = useState('');
+  const [mostrarForm, setMostrarForm] = useState(false);
 
   async function cargar() {
     setCargando(true);
@@ -114,49 +115,61 @@ export default function ReservasList({ sesion }) {
   return (
     <section className="vista">
       <div className="vista-encabezado">
-        <h2>Reservas</h2>
+        <div>
+          <h2>Reservas</h2>
+          <p className="vista-sub">Gestiona tus reservas de espacios</p>
+        </div>
+        <button
+          type="button"
+          className="boton primario"
+          onClick={() => setMostrarForm((v) => !v)}
+        >
+          {mostrarForm ? 'Cancelar' : 'Nueva reserva'}
+        </button>
       </div>
 
       {error && <div className="alerta error">{error}</div>}
 
-      <form className="tarjeta formulario" onSubmit={crear}>
-        <h3>Nueva reserva</h3>
-        {errorForm && <div className="alerta error">{errorForm}</div>}
-        <Campo label="Espacio" name="spaceId">
-          <select name="spaceId" value={form.spaceId} onChange={manejarCambio}>
-            <option value="">Selecciona un espacio...</option>
-            {espacios.map((esp) => (
-              <option key={esp.id} value={esp.id}>
-                {esp.nombre}
-              </option>
-            ))}
-          </select>
-        </Campo>
-        <Campo
-          label="Inicio"
-          name="fechaInicio"
-          type="datetime-local"
-          value={form.fechaInicio}
-          onChange={manejarCambio}
-        />
-        <Campo
-          label="Fin"
-          name="fechaFin"
-          type="datetime-local"
-          value={form.fechaFin}
-          onChange={manejarCambio}
-        />
-        <Campo
-          label="Notas (opcional)"
-          name="notas"
-          value={form.notas}
-          onChange={manejarCambio}
-          placeholder="Motivo de la reserva"
-        />
-        <button type="submit" className="boton primario" disabled={creando}>
-          {creando ? 'Reservando...' : 'Reservar'}
-        </button>
-      </form>
+      {mostrarForm && (
+        <form className="tarjeta formulario" onSubmit={crear}>
+          <h3>Nueva reserva</h3>
+          {errorForm && <div className="alerta error">{errorForm}</div>}
+          <Campo label="Espacio" name="spaceId">
+            <select name="spaceId" value={form.spaceId} onChange={manejarCambio}>
+              <option value="">Selecciona un espacio...</option>
+              {espacios.map((esp) => (
+                <option key={esp.id} value={esp.id}>
+                  {esp.nombre}
+                </option>
+              ))}
+            </select>
+          </Campo>
+          <Campo
+            label="Inicio"
+            name="fechaInicio"
+            type="datetime-local"
+            value={form.fechaInicio}
+            onChange={manejarCambio}
+          />
+          <Campo
+            label="Fin"
+            name="fechaFin"
+            type="datetime-local"
+            value={form.fechaFin}
+            onChange={manejarCambio}
+          />
+          <Campo
+            label="Notas (opcional)"
+            name="notas"
+            value={form.notas}
+            onChange={manejarCambio}
+            placeholder="Motivo de la reserva"
+          />
+          <button type="submit" className="boton primario" disabled={creando}>
+            {creando ? 'Reservando...' : 'Reservar'}
+          </button>
+        </form>
+      )}
 
       <SearchBar
         valor={busqueda}
@@ -165,9 +178,15 @@ export default function ReservasList({ sesion }) {
       />
 
       {cargando ? (
-        <p className="estado">Cargando reservas...</p>
+        <div className="vacio">
+          <div className="spinner" />
+          <p className="estado">Cargando reservas...</p>
+        </div>
       ) : filtradas.length === 0 ? (
-        <p className="estado">No se encontraron resultados</p>
+        <div className="vacio">
+          <h3>Sin reservas</h3>
+          <p>No se encontraron reservas que coincidan con tu búsqueda.</p>
+        </div>
       ) : (
         <div className="tabla-envoltura">
           <table className="tabla">

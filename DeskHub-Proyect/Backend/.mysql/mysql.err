@@ -105,3 +105,34 @@ Version: '12.3.3-MariaDB'  socket: '/home/cesar/Escritorio/Proyect-Deskhub/DeskH
 2026-09-12 20:35:39 0 [Note] mysqld: ready for connections.
 Version: '12.3.3-MariaDB'  socket: '/home/cesar/Escritorio/Proyect-Deskhub/DeskHub-Proyect/Backend/.mysql/mysql.sock'  port: 3307  Arch Linux
 2026-09-12 20:36:10 0 [Note] InnoDB: Memory pressure event disregarded; innodb_buffer_pool_size=128m, innodb_buffer_pool_size_auto_min=8388608m
+2026-09-12 21:04:31 0 [Note] mysqld (initiated by: unknown): Normal shutdown
+2026-09-12 21:04:31 0 [Note] InnoDB: FTS optimize thread exiting.
+2026-09-12 21:04:31 0 [Note] InnoDB: Starting shutdown...
+2026-09-12 21:04:31 0 [Note] InnoDB: Dumping buffer pool(s) to /home/cesar/Escritorio/Proyect-Deskhub/DeskHub-Proyect/Backend/.mysql/data/ib_buffer_pool
+2026-09-12 21:04:31 0 [Note] InnoDB: Buffer pool(s) dump completed at 260912 21:04:31
+2026-09-12 21:04:31 0 [Note] InnoDB: Removed temporary tablespace data file: "./ibtmp1"
+2026-09-12 21:04:31 0 [Note] Shutdown completed; log sequence number 80278; transaction id 75
+2026-09-12 21:04:31 0 [Note] mysqld: Shutdown complete
+2026-09-13 21:42:47 0 [Note] Starting MariaDB 12.3.3-MariaDB source revision 83e909fc2a0dbc394b4b683fb3fa2d7dcf26cc5e server_uid OP9pYxkhL12V3WLfaJUjVOeIn4I= as process 192310
+2026-09-13 21:42:47 0 [Note] InnoDB: Compressed tables use zlib 1.3.2
+2026-09-13 21:42:47 0 [Note] InnoDB: Number of transaction pools: 1
+2026-09-13 21:42:47 0 [Note] InnoDB: Using crc32 + pclmulqdq instructions
+2026-09-13 21:42:47 0 [Note] InnoDB: Using io_uring
+2026-09-13 21:42:47 0 [Note] InnoDB: innodb_buffer_pool_size_max=8388608m, innodb_buffer_pool_size=128m
+2026-09-13 21:42:47 0 [Note] InnoDB: Initialized memory pressure event listener
+2026-09-13 21:42:47 0 [Note] InnoDB: Completed initialization of buffer pool
+2026-09-13 21:42:47 0 [Note] InnoDB: Buffered log writes (block size=512 bytes)
+2026-09-13 21:42:47 0 [Note] InnoDB: End of log at LSN=80278
+2026-09-13 21:42:47 0 [Note] InnoDB: Opened 3 undo tablespaces
+2026-09-13 21:42:47 0 [Note] InnoDB: 128 rollback segments in 3 undo tablespaces are active.
+2026-09-13 21:42:47 0 [Note] InnoDB: Setting file './ibtmp1' size to 12.000MiB. Physically writing the file full; Please wait ...
+2026-09-13 21:42:47 0 [Note] InnoDB: File './ibtmp1' size is now 12.000MiB.
+2026-09-13 21:42:47 0 [Note] InnoDB: log sequence number 80278; transaction id 70
+2026-09-13 21:42:47 0 [Note] InnoDB: Loading buffer pool(s) from /home/cesar/Escritorio/Proyect-Deskhub/DeskHub-Proyect/Backend/.mysql/data/ib_buffer_pool
+2026-09-13 21:42:47 0 [Note] Plugin 'wsrep-provider' is disabled.
+2026-09-13 21:42:47 0 [Note] InnoDB: Buffer pool(s) load completed at 260913 21:42:47
+2026-09-13 21:42:47 0 [Note] InnoDB: Memory pressure event disregarded; innodb_buffer_pool_size=128m, innodb_buffer_pool_size_auto_min=8388608m
+2026-09-13 21:42:47 0 [Note] Server socket created on IP: '127.0.0.1', port: '3307'.
+2026-09-13 21:42:47 0 [Note] mysqld: Event Scheduler: Loaded 0 events
+2026-09-13 21:42:47 0 [Note] mysqld: ready for connections.
+Version: '12.3.3-MariaDB'  socket: '/home/cesar/Escritorio/Proyect-Deskhub/DeskHub-Proyect/Backend/.mysql/mysql.sock'  port: 3307  Arch Linux

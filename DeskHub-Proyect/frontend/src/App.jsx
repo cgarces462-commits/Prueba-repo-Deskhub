@@ -3,6 +3,7 @@ import { getSesion, cerrarSesion } from './services/api';
 import LoginForm from './components/LoginForm';
 import RegistroForm from './components/RegistroForm';
 import Navbar from './components/Navbar';
+import Dashboard from './components/Dashboard';
 import EspaciosList from './components/EspaciosList';
 import ReservasList from './components/ReservasList';
 import UsuariosList from './components/UsuariosList';
@@ -11,7 +12,7 @@ export default function App() {
   const [sesion, setSesion] = useState(() => getSesion()?.usuario || null);
   const [modoAuth, setModoAuth] = useState('login');
   const [aviso, setAviso] = useState('');
-  const [vista, setVista] = useState('espacios');
+  const [vista, setVista] = useState('inicio');
 
   useEffect(() => {
     function alExpirar() {
@@ -26,7 +27,7 @@ export default function App() {
   function iniciarSesion(usuario) {
     setAviso('');
     setSesion(usuario);
-    setVista('espacios');
+    setVista('inicio');
   }
 
   function salir() {
@@ -69,6 +70,7 @@ export default function App() {
         onCerrarSesion={salir}
       />
       <main className="contenedor">
+        {vista === 'inicio' && <Dashboard sesion={sesion} onNavegar={setVista} />}
         {vista === 'espacios' && <EspaciosList sesion={sesion} />}
         {vista === 'reservas' && <ReservasList sesion={sesion} />}
         {vista === 'usuarios' && <UsuariosList sesion={sesion} />}

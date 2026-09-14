@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { api } from '../services/api';
 import { validarRegistro, hayErrores } from '../utils/validacion';
 import Campo from './Campo';
+import AuthLayout from './AuthLayout';
 
 export default function RegistroForm({ onRegistrado, irALogin }) {
   const [form, setForm] = useState({
@@ -48,69 +49,73 @@ export default function RegistroForm({ onRegistrado, irALogin }) {
   }
 
   return (
-    <div className="auth">
-      <form className="tarjeta auth-tarjeta" onSubmit={manejarEnvio} noValidate>
-        <h1>Crear cuenta</h1>
-        <p className="subtitulo">Regístrate para reservar espacios en DeskHub</p>
+    <AuthLayout
+      titulo="Crea tu cuenta"
+      subtitulo="Regístrate gratis y empieza a reservar"
+    >
+      {errorServidor && <div className="alerta error">{errorServidor}</div>}
 
-        {errorServidor && <div className="alerta error">{errorServidor}</div>}
+      <form onSubmit={manejarEnvio} noValidate>
+        <div className="campos">
+          <div className="form-row">
+            <Campo
+              label="Nombre"
+              name="nombre"
+              value={form.nombre}
+              onChange={manejarCambio}
+              error={errores.nombre}
+              placeholder="Ana"
+            />
+            <Campo
+              label="Apellido"
+              name="apellido"
+              value={form.apellido}
+              onChange={manejarCambio}
+              error={errores.apellido}
+              placeholder="Pérez"
+            />
+          </div>
+          <Campo
+            label="Email"
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={manejarCambio}
+            error={errores.email}
+            placeholder="tu@email.com"
+            autoComplete="email"
+          />
+          <Campo
+            label="Teléfono (opcional)"
+            name="telefono"
+            value={form.telefono}
+            onChange={manejarCambio}
+            error={errores.telefono}
+            placeholder="3001234567"
+          />
+          <Campo
+            label="Contraseña"
+            name="password"
+            type="password"
+            value={form.password}
+            onChange={manejarCambio}
+            error={errores.password}
+            placeholder="Mínimo 6 caracteres"
+            autoComplete="new-password"
+          />
+          <Campo
+            label="Confirmar contraseña"
+            name="confirmar"
+            type="password"
+            value={form.confirmar}
+            onChange={manejarCambio}
+            error={errores.confirmar}
+            placeholder="Repite la contraseña"
+            autoComplete="new-password"
+          />
+        </div>
 
-        <Campo
-          label="Nombre"
-          name="nombre"
-          value={form.nombre}
-          onChange={manejarCambio}
-          error={errores.nombre}
-          placeholder="Ana"
-        />
-        <Campo
-          label="Apellido"
-          name="apellido"
-          value={form.apellido}
-          onChange={manejarCambio}
-          error={errores.apellido}
-          placeholder="Pérez"
-        />
-        <Campo
-          label="Email"
-          name="email"
-          type="email"
-          value={form.email}
-          onChange={manejarCambio}
-          error={errores.email}
-          placeholder="tu@email.com"
-          autoComplete="email"
-        />
-        <Campo
-          label="Teléfono (opcional)"
-          name="telefono"
-          value={form.telefono}
-          onChange={manejarCambio}
-          error={errores.telefono}
-          placeholder="3001234567"
-        />
-        <Campo
-          label="Contraseña"
-          name="password"
-          type="password"
-          value={form.password}
-          onChange={manejarCambio}
-          error={errores.password}
-          placeholder="Mínimo 6 caracteres"
-          autoComplete="new-password"
-        />
-        <Campo
-          label="Confirmar contraseña"
-          name="confirmar"
-          type="password"
-          value={form.confirmar}
-          onChange={manejarCambio}
-          error={errores.confirmar}
-          placeholder="Repite la contraseña"
-          autoComplete="new-password"
-        />
-
-        <button type="submit" className="boton primario" disabled={enviando}>
+        <button type="submit" className="boton primario block" disabled={enviando}>
           {enviando ? 'Registrando...' : 'Crear cuenta'}
         </button>
 
@@ -121,6 +126,6 @@ export default function RegistroForm({ onRegistrado, irALogin }) {
           </button>
         </p>
       </form>
-    </div>
+    </AuthLayout>
   );
 }

@@ -71,7 +71,10 @@ export default function UsuariosList({ sesion }) {
   return (
     <section className="vista">
       <div className="vista-encabezado">
-        <h2>Usuarios</h2>
+        <div>
+          <h2>Usuarios</h2>
+          <p className="vista-sub">Administra cuentas, roles y accesos</p>
+        </div>
       </div>
 
       {!puedeGestionar ? (
@@ -89,9 +92,15 @@ export default function UsuariosList({ sesion }) {
           />
 
           {cargando ? (
-            <p className="estado">Cargando usuarios...</p>
+            <div className="vacio">
+              <div className="spinner" />
+              <p className="estado">Cargando usuarios...</p>
+            </div>
           ) : filtrados.length === 0 ? (
-            <p className="estado">No se encontraron resultados</p>
+            <div className="vacio">
+              <h3>Sin usuarios</h3>
+              <p>No se encontraron usuarios que coincidan con tu búsqueda.</p>
+            </div>
           ) : (
             <div className="tabla-envoltura">
               <table className="tabla">
