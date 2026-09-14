@@ -122,7 +122,7 @@ if %errorlevel%==0 (
     echo [OK]  Frontend ya esta corriendo
 ) else (
     echo [..]  Levantando frontend ^(puerto 5173^)
-    start "DeskHub Frontend" /min cmd /c "cd /d %FRONTEND% && npm run dev > %RAIZ%.frontend.log 2>&1"
+    start "DeskHub Frontend" /min cmd /c "cd /d %FRONTEND% && node node_modules\vite\bin\vite.js > %RAIZ%.frontend.log 2>&1"
 )
 
 echo.
