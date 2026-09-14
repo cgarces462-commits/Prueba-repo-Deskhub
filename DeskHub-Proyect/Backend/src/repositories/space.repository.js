@@ -1,8 +1,12 @@
-const { Space } = require('../models');
+const { Space, SpaceImage } = require('../models');
 
-const findAll = (where = {}) => Space.findAll({ where });
+const CON_INCLUYE_IMAGENES = {
+  include: [{ model: SpaceImage, as: 'imagenes', separate: true }],
+};
 
-const findById = (id) => Space.findByPk(id);
+const findAll = (where = {}) => Space.findAll({ ...CON_INCLUYE_IMAGENES, where });
+
+const findById = (id) => Space.findByPk(id, CON_INCLUYE_IMAGENES);
 
 const create = (data) => Space.create(data);
 

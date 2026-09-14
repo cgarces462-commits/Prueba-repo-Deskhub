@@ -136,3 +136,8 @@ Version: '12.3.3-MariaDB'  socket: '/home/cesar/Escritorio/Proyect-Deskhub/DeskH
 2026-09-13 21:42:47 0 [Note] mysqld: Event Scheduler: Loaded 0 events
 2026-09-13 21:42:47 0 [Note] mysqld: ready for connections.
 Version: '12.3.3-MariaDB'  socket: '/home/cesar/Escritorio/Proyect-Deskhub/DeskHub-Proyect/Backend/.mysql/mysql.sock'  port: 3307  Arch Linux
+2026-09-13 22:58:31 0 [Note] InnoDB: Memory pressure event disregarded; innodb_buffer_pool_size=128m, innodb_buffer_pool_size_auto_min=8388608m
+2026-09-13 23:25:26 0 [Note] InnoDB: Memory pressure event disregarded; innodb_buffer_pool_size=128m, innodb_buffer_pool_size_auto_min=8388608m
+2026-09-14  0:04:21 0 [Note] InnoDB: Memory pressure event disregarded; innodb_buffer_pool_size=128m, innodb_buffer_pool_size_auto_min=8388608m
+2026-09-14  0:47:42 0 [Note] InnoDB: Memory pressure event disregarded; innodb_buffer_pool_size=128m, innodb_buffer_pool_size_auto_min=8388608m
+2026-09-14  0:58:23 0 [Note] InnoDB: Memory pressure event disregarded; innodb_buffer_pool_size=128m, innodb_buffer_pool_size_auto_min=8388608m

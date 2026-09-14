@@ -30,14 +30,15 @@ export function cerrarSesion() {
 
 async function pedir(ruta, { method = 'GET', body, auth = true } = {}) {
   const headers = {};
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  const esFormData = body instanceof FormData;
+  if (body !== undefined && !esFormData) headers['Content-Type'] = 'application/json';
   const token = getToken();
   if (auth && token) headers.Authorization = `Bearer ${token}`;
 
   const res = await fetch(`${BASE}${ruta}`, {
     method,
     headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body: body !== undefined ? (esFormData ? body : JSON.stringify(body)) : undefined,
   });
 
   let data = {};
@@ -70,6 +71,13 @@ export const api = {
   editarEspacio: (id, datos) =>
     pedir(`/spaces/${id}`, { method: 'PUT', body: datos }),
   eliminarEspacio: (id) => pedir(`/spaces/${id}`, { method: 'DELETE' }),
+  subirImagen: (id, archivo) => {
+    const form = new FormData();
+    form.append('imagen', archivo);
+    return pedir(`/spaces/${id}/images`, { method: 'POST', body: form });
+  },
+  eliminarImagen: (id, imagenId) =>
+    pedir(`/spaces/${id}/images/${imagenId}`, { method: 'DELETE' }),
 
   reservas: () => pedir('/reservations'),
   crearReserva: (datos) => pedir('/reservations', { method: 'POST', body: datos }),

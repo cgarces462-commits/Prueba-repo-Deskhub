@@ -116,11 +116,12 @@ export default function UsuariosList({ sesion }) {
                 </thead>
                 <tbody>
                   {filtrados.map((u) => {
-                    const esYo = u.id === sesion.id;
+                    const esYo = String(u.id) === String(sesion.id);
                     return (
                       <tr key={u.id}>
                         <td>
                           {u.nombre} {u.apellido || ''}
+                          {esYo && <span className="badge yo">(Tú)</span>}
                         </td>
                         <td>{u.email}</td>
                         <td>{u.telefono || '—'}</td>

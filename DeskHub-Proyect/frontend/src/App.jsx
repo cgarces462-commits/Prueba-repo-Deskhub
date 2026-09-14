@@ -7,8 +7,11 @@ import Dashboard from './components/Dashboard';
 import EspaciosList from './components/EspaciosList';
 import ReservasList from './components/ReservasList';
 import UsuariosList from './components/UsuariosList';
+import FondoIteracion from './components/FondoIteracion';
+import { useTema } from './context/useTema';
 
 export default function App() {
+  const { tema } = useTema();
   const [sesion, setSesion] = useState(() => getSesion()?.usuario || null);
   const [modoAuth, setModoAuth] = useState('login');
   const [aviso, setAviso] = useState('');
@@ -20,8 +23,10 @@ export default function App() {
       setAviso('Tu sesión expiró. Vuelve a iniciar sesión.');
     }
     window.addEventListener('deskhub:sesion-expirada', alExpirar);
-    return () =>
+
+    return () => {
       window.removeEventListener('deskhub:sesion-expirada', alExpirar);
+    };
   }, []);
 
   function iniciarSesion(usuario) {
@@ -62,7 +67,8 @@ export default function App() {
   }
 
   return (
-    <div className="app">
+    <div className="app" data-rol={sesion.role?.nombre || ''} data-tema={tema}>
+      {tema === 'glass' && <FondoIteracion />}
       <Navbar
         sesion={sesion}
         vistaActual={vista}

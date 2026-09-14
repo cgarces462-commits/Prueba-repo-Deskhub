@@ -2,17 +2,55 @@ import { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { etiquetaEstado, formatoFecha } from '../utils/catalogos';
 import { esStaff } from '../utils/roles';
+import { imagenesDeEspacio } from '../utils/imagenes';
 import { IconAlert, IconBuilding, IconCalendar, IconCircle, IconLayers } from './Icons';
 
 const ESTADOS_ACTIVOS = ['pendiente', 'confirmada'];
 
+const LISTA_SALUDOS = [
+  { prefijo: '¡Buenos días', emoji: '☀️', momento: 'manana' },
+  { prefijo: '¡Hola', emoji: '👋', momento: 'cualquiera' },
+  { prefijo: '¡Buenas tardes', emoji: '☕', momento: 'tarde' },
+  { prefijo: '¡A romperla hoy', emoji: '🚀', momento: 'cualquiera' },
+  { prefijo: '¡Buenas noches', emoji: '🌙', momento: 'noche' },
+  { prefijo: '¡Listo para crear', emoji: '💡', momento: 'cualquiera' },
+  { prefijo: '¡Bienvenido a tu espacio', emoji: '🏢', momento: 'cualquiera' },
+  { prefijo: '¡Mucho éxito hoy', emoji: '🎯', momento: 'cualquiera' },
+  { prefijo: '¡Energía al máximo', emoji: '⚡', momento: 'cualquiera' },
+  { prefijo: '¡Día de grandes logros', emoji: '🏆', momento: 'cualquiera' },
+  { prefijo: '¡Concentración y enfoque', emoji: '🔥', momento: 'cualquiera' },
+  { prefijo: '¡Todo listo para brillar', emoji: '✨', momento: 'cualquiera' },
+  { prefijo: '¡Qué gusto tenerte aquí', emoji: '🎉', momento: 'cualquiera' },
+  { prefijo: '¡A trabajar con pasión', emoji: '💻', momento: 'cualquiera' },
+];
+
+function obtenerSaludo(nombre = 'equipo') {
+  const hora = new Date().getHours();
+  const filtro = LISTA_SALUDOS.filter((s) => {
+    if (s.momento === 'cualquiera') return true;
+    if (hora >= 5 && hora < 12) return s.momento === 'manana';
+    if (hora >= 12 && hora < 19) return s.momento === 'tarde';
+    return s.momento === 'noche';
+  });
+  const s = filtro[Math.floor(Math.random() * filtro.length)] || LISTA_SALUDOS[0];
+  return {
+    texto: `${s.prefijo}, ${nombre || 'equipo'}`,
+    emoji: s.emoji,
+  };
+}
+
 export default function Dashboard({ sesion, onNavegar }) {
+  const [saludo, setSaludo] = useState(() => obtenerSaludo(sesion.nombre));
   const [estado, setEstado] = useState({
     cargando: true,
     error: '',
     espacios: [],
     reservas: [],
   });
+
+  function cambiarSaludo() {
+    setSaludo(obtenerSaludo(sesion.nombre));
+  }
 
   useEffect(() => {
     let activo = true;
@@ -73,7 +111,17 @@ export default function Dashboard({ sesion, onNavegar }) {
     <section className="vista">
       <div className="vista-encabezado">
         <div>
-          <h2>Hola, {sesion.nombre || 'equipo'} 👋</h2>
+          <h2
+            className="saludo-personalizado"
+            onClick={cambiarSaludo}
+            title="Haz clic para ver otro saludo personalizado"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && cambiarSaludo()}
+          >
+            <span>{saludo.texto}</span>
+            <span className="saludo-emoji" aria-hidden="true">{saludo.emoji}</span>
+          </h2>
           <p className="vista-sub">
             {esStaff(sesion.role?.nombre)
               ? 'Resumen general de espacios y reservas'
@@ -120,9 +168,15 @@ export default function Dashboard({ sesion, onNavegar }) {
                 </button>
               </div>
             ) : (
-              <ul className="lista-proxima">
-                {proximas.map((r) => (
-                  <li key={r.id}>
+              <ul className="lista-proxima lista-float">
+                {proximas.map((r, i) => (
+                  <li key={r.id} style={{ '--i': i + 1 }}>
+                    <img
+                      className="lista-float-img"
+                      src={imagenesDeEspacio(r.espacio)[0]}
+                      alt=""
+                      loading="lazy"
+                    />
                     <div>
                       <strong>{r.espacio?.nombre || 'Espacio'}</strong>
                       <span className="meta">{formatoFecha(r.fechaInicio)} → {formatoFecha(r.fechaFin)}</span>

@@ -6,8 +6,11 @@ import {
   etiquetaEstado,
   formatoFecha,
 } from '../utils/catalogos';
+import { imagenesDeEspacio } from '../utils/imagenes';
+import { IconImage } from './Icons';
 import SearchBar from './SearchBar';
 import Campo from './Campo';
+import CarruselImagenes from './CarruselImagenes';
 
 const FORM_VACIO = { spaceId: '', fechaInicio: '', fechaFin: '', notas: '' };
 
@@ -25,6 +28,7 @@ export default function ReservasList({ sesion }) {
   const [creando, setCreando] = useState(false);
   const [errorForm, setErrorForm] = useState('');
   const [mostrarForm, setMostrarForm] = useState(false);
+  const [carrusel, setCarrusel] = useState(null);
 
   async function cargar() {
     setCargando(true);
@@ -206,7 +210,21 @@ export default function ReservasList({ sesion }) {
                 const activa = !['cancelada', 'completada'].includes(r.estado);
                 return (
                   <tr key={r.id}>
-                    <td>{r.espacio?.nombre || '—'}</td>
+                    <td>
+                      {r.espacio ? (
+                        <span className="reserva-espacio">
+                          <img
+                            className="reserva-thumb"
+                            src={imagenesDeEspacio(r.espacio)[0]}
+                            alt=""
+                            loading="lazy"
+                          />
+                          <span>{r.espacio.nombre}</span>
+                        </span>
+                      ) : (
+                        '—'
+                      )}
+                    </td>
                     <td>
                       {r.usuario
                         ? `${r.usuario.nombre} ${r.usuario.apellido || ''}`.trim()
@@ -220,6 +238,16 @@ export default function ReservasList({ sesion }) {
                       </span>
                     </td>
                     <td className="acciones">
+                      {r.espacio && (
+                        <button
+                          type="button"
+                          className="boton secundario"
+                          onClick={() => setCarrusel(r.espacio)}
+                          title="Ver imágenes en carrusel"
+                        >
+                          <IconImage className="icon" /> Ver
+                        </button>
+                      )}
                       {staff ? (
                         <select
                           value={r.estado}
@@ -250,6 +278,10 @@ export default function ReservasList({ sesion }) {
             </tbody>
           </table>
         </div>
+      )}
+
+      {carrusel && (
+        <CarruselImagenes espacio={carrusel} onCerrar={() => setCarrusel(null)} />
       )}
     </section>
   );

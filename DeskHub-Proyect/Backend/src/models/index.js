@@ -3,6 +3,7 @@ const Role = require('./role.model');
 const User = require('./user.model');
 const Space = require('./space.model');
 const Reservation = require('./reservation.model');
+const SpaceImage = require('./space_image.model');
 
 // Role <-> User (1:N)
 Role.hasMany(User, { foreignKey: 'roleId', as: 'usuarios' });
@@ -16,10 +17,15 @@ Reservation.belongsTo(User, { foreignKey: 'userId', as: 'usuario' });
 Space.hasMany(Reservation, { foreignKey: 'spaceId', as: 'reservas' });
 Reservation.belongsTo(Space, { foreignKey: 'spaceId', as: 'espacio' });
 
+// Space <-> SpaceImage (1:N)
+Space.hasMany(SpaceImage, { foreignKey: 'spaceId', as: 'imagenes', onDelete: 'CASCADE' });
+SpaceImage.belongsTo(Space, { foreignKey: 'spaceId', as: 'espacio' });
+
 module.exports = {
   sequelize,
   Role,
   User,
   Space,
   Reservation,
+  SpaceImage,
 };

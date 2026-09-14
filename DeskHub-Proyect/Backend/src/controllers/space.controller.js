@@ -45,4 +45,22 @@ async function eliminar(req, res, next) {
   }
 }
 
-module.exports = { listar, obtenerPorId, crear, actualizar, eliminar };
+async function subirImagen(req, res, next) {
+  try {
+    const imagen = await spaceService.subirImagen(req.params.id, req.file);
+    res.status(201).json({ mensaje: 'Imagen agregada', imagen });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function eliminarImagen(req, res, next) {
+  try {
+    await spaceService.eliminarImagen(req.params.id, req.params.imagenId);
+    res.status(200).json({ mensaje: 'Imagen eliminada' });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { listar, obtenerPorId, crear, actualizar, eliminar, subirImagen, eliminarImagen };

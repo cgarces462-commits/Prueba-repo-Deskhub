@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const spaceController = require('../controllers/space.controller');
 const { autenticar, autorizar } = require('../middlewares/auth.middleware');
+const { subirImagen } = require('../middlewares/upload.middleware');
 const { ROLES } = require('../config/roles');
 
 const router = Router();
@@ -18,5 +19,20 @@ router.put(
   spaceController.actualizar
 );
 router.delete('/:id', autenticar, autorizar(ROLES.SUPER_ADMIN), spaceController.eliminar);
+
+// Galería de imágenes del espacio
+router.post(
+  '/:id/images',
+  autenticar,
+  autorizar(ROLES.SUPER_ADMIN, ROLES.ADMIN),
+  subirImagen.single('imagen'),
+  spaceController.subirImagen
+);
+router.delete(
+  '/:id/images/:imagenId',
+  autenticar,
+  autorizar(ROLES.SUPER_ADMIN, ROLES.ADMIN),
+  spaceController.eliminarImagen
+);
 
 module.exports = router;

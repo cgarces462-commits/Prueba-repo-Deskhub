@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { api } from '../services/api';
 import { esGestion, esSuperAdmin } from '../utils/roles';
 import { etiquetaTipo, formatoPrecio } from '../utils/catalogos';
+import { imagenesDeEspacio } from '../utils/imagenes';
 import {
   IconBuilding,
   IconCalendar,
@@ -9,6 +10,7 @@ import {
   IconConference,
   IconDesktop,
   IconEdit,
+  IconImage,
   IconMapPin,
   IconPlus,
   IconTrash,
@@ -17,6 +19,8 @@ import {
 import SearchBar from './SearchBar';
 import EspacioModal from './EspacioModal';
 import ReservaModal from './ReservaModal';
+import CarruselImagenes from './CarruselImagenes';
+import TarjetaTilt from './TarjetaTilt';
 
 const ICONOS_TIPO = {
   escritorio: IconDesktop,
@@ -37,6 +41,7 @@ export default function EspaciosList({ sesion }) {
 
   const [modalEspacio, setModalEspacio] = useState(null);
   const [modalReserva, setModalReserva] = useState(null);
+  const [carrusel, setCarrusel] = useState(null);
 
   async function cargar() {
     setCargando(true);
@@ -83,6 +88,15 @@ export default function EspaciosList({ sesion }) {
     }
   }
 
+  async function refrescarImagenes() {
+    try {
+      const data = await api.espacios();
+      setEspacios(data.espacios || []);
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
   return (
     <section className="vista">
       <div className="vista-encabezado">
@@ -119,70 +133,90 @@ export default function EspaciosList({ sesion }) {
         <div className="grid">
           {filtrados.map((esp) => {
             const Icono = ICONOS_TIPO[esp.tipo] || IconBuilding;
+            const galeria = imagenesDeEspacio(esp);
             return (
-              <article key={esp.id} className="tarjeta espacio">
-                <header className="espacio-header">
-                  <span className={`espacio-icono espacio-icono-${esp.tipo}`}>
-                    <Icono className="icon" />
-                  </span>
-                  <span className={`badge ${esp.disponible ? 'ok' : 'off'}`}>
-                    {esp.disponible ? 'Disponible' : 'No disponible'}
-                  </span>
-                </header>
-
-                <h3 className="espacio-nombre">{esp.nombre}</h3>
-                <p className="meta espacio-tipo">{etiquetaTipo(esp.tipo)}</p>
-
-                <div className="espacio-caracteristicas">
-                  {esp.ubicacion && (
-                    <span className="meta">
-                      <IconMapPin className="icon" /> {esp.ubicacion}
-                    </span>
-                  )}
-                  <span className="meta">
-                    <IconUsers className="icon" /> {esp.capacidad} personas
-                  </span>
-                  {esp.descripcion && (
-                    <span className="meta">
-                      <IconClock className="icon" /> {esp.descripcion}
-                    </span>
-                  )}
-                </div>
-
-                <div className="espacio-precio">{formatoPrecio(esp.precioPorHora)} <small>/ hora</small></div>
-
-                <footer className="espacio-acciones">
-                  {esp.disponible && (
-                    <button
-                      type="button"
-                      className="boton primario"
-                      onClick={() => setModalReserva(esp)}
-                    >
-                      <IconCalendar className="icon" /> Reservar
+              <TarjetaTilt key={esp.id} className="tilt-espacio">
+                <article className="tarjeta espacio">
+                  <div className="espacio-galeria" onClick={() => setCarrusel(esp)}>
+                    {galeria.slice(0, 3).map((src, i) => (
+                      <img key={src} className={i === 0 ? 'primera' : ''} src={src} alt="" loading="lazy" />
+                    ))}
+                    <button type="button" className="espacio-galeria-btn" aria-label={`Ver galería de ${esp.nombre}`}>
+                      <IconImage className="icon" />
                     </button>
-                  )}
-                  {puedeGestionar && (
+                  </div>
+
+                  <header className="espacio-header">
+                    <span className={`espacio-icono espacio-icono-${esp.tipo}`}>
+                      <Icono className="icon" />
+                    </span>
+                    <span className={`badge ${esp.disponible ? 'ok' : 'off'}`}>
+                      {esp.disponible ? 'Disponible' : 'No disponible'}
+                    </span>
+                  </header>
+
+                  <h3 className="espacio-nombre">{esp.nombre}</h3>
+                  <p className="meta espacio-tipo">{etiquetaTipo(esp.tipo)}</p>
+
+                  <div className="espacio-caracteristicas">
+                    {esp.ubicacion && (
+                      <span className="meta">
+                        <IconMapPin className="icon" /> {esp.ubicacion}
+                      </span>
+                    )}
+                    <span className="meta">
+                      <IconUsers className="icon" /> {esp.capacidad} personas
+                    </span>
+                    {esp.descripcion && (
+                      <span className="meta">
+                        <IconClock className="icon" /> {esp.descripcion}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="espacio-precio">{formatoPrecio(esp.precioPorHora)} <small>/ hora</small></div>
+
+                  <footer className="espacio-acciones">
+                    {esp.disponible && (
+                      <button
+                        type="button"
+                        className="boton primario"
+                        onClick={() => setModalReserva(esp)}
+                      >
+                        <IconCalendar className="icon" /> Reservar
+                      </button>
+                    )}
                     <button
                       type="button"
                       className="boton secundario"
-                      onClick={() => abrirEditar(esp)}
-                      aria-label={`Editar ${esp.nombre}`}
+                      onClick={() => setCarrusel(esp)}
+                      aria-label={`Ver imágenes de ${esp.nombre}`}
                     >
-                      <IconEdit className="icon" /> Editar
+                      <IconImage className="icon" /> Ver imágenes
                     </button>
-                  )}
-                  {esSuper && (
-                    <button
-                      type="button"
-                      className="boton peligro icono"
-                      onClick={() => eliminar(esp)}
-                      aria-label={`Eliminar ${esp.nombre}`}
-                    >
-                      <IconTrash className="icon" />
-                    </button>
-                  )}
-                </footer>
-              </article>
+                    {puedeGestionar && (
+                      <button
+                        type="button"
+                        className="boton secundario"
+                        onClick={() => abrirEditar(esp)}
+                        aria-label={`Editar ${esp.nombre}`}
+                      >
+                        <IconEdit className="icon" /> Editar
+                      </button>
+                    )}
+                    {esSuper && (
+                      <button
+                        type="button"
+                        className="boton peligro icono"
+                        onClick={() => eliminar(esp)}
+                        aria-label={`Eliminar ${esp.nombre}`}
+                      >
+                        <IconTrash className="icon" />
+                      </button>
+                    )}
+                  </footer>
+                </article>
+              </TarjetaTilt>
             );
           })}
         </div>
@@ -194,6 +228,7 @@ export default function EspaciosList({ sesion }) {
           espacioAEditar={modalEspacio.modo === 'editar' ? modalEspacio.espacio : null}
           onCerrar={() => setModalEspacio(null)}
           onGuardado={cargar}
+          onImagenesCambiadas={refrescarImagenes}
         />
       )}
 
@@ -204,6 +239,10 @@ export default function EspaciosList({ sesion }) {
           onCerrar={() => setModalReserva(null)}
           onReservaExitosa={cargar}
         />
+      )}
+
+      {carrusel && (
+        <CarruselImagenes espacio={carrusel} onCerrar={() => setCarrusel(null)} />
       )}
     </section>
   );

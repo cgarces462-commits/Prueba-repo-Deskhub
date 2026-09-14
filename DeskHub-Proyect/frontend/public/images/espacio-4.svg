@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d97706"/>
+      <stop offset="1" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <circle cx="150" cy="120" r="150" fill="rgba(255,255,255,0.09)"/>
+  <circle cx="680" cy="410" r="170" fill="rgba(0,0,0,0.12)"/>
+  <rect x="0" y="440" width="800" height="60" fill="rgba(0,0,0,0.22)"/>
+  <rect x="120" y="130" width="560" height="320" rx="16" fill="rgba(0,0,0,0.18)"/>
+  <rect x="150" y="160" width="190" height="14" rx="7" fill="rgba(255,255,255,0.35)"/>
+  <rect x="360" y="160" width="190" height="14" rx="7" fill="rgba(255,255,255,0.2)"/>
+  <rect x="150" y="240" width="500" height="26" rx="8" fill="#fde68a"/>
+  <rect x="180" y="266" width="12" height="134" rx="4" fill="#fcd34d"/>
+  <rect x="616" y="266" width="12" height="134" rx="4" fill="#fcd34d"/>
+  <rect x="150" y="228" width="500" height="12" rx="4" fill="#78350f"/>
+  <circle cx="240" cy="340" r="30" fill="#1e293b"/>
+  <circle cx="240" cy="340" r="14" fill="#fbbf24"/>
+  <rect x="230" y="370" width="8" height="30" rx="3" fill="#94a3b8"/>
+  <circle cx="440" cy="340" r="30" fill="#1e293b"/>
+  <circle cx="440" cy="340" r="14" fill="#f472b6"/>
+  <rect x="430" y="370" width="8" height="30" rx="3" fill="#94a3b8"/>
+  <rect x="560" y="320" width="60" height="40" rx="8" fill="#78350f"/>
+  <rect x="566" y="326" width="48" height="28" rx="4" fill="#fde68a"/>
+  <rect x="252" y="392" width="110" height="12" rx="6" fill="rgba(255,255,255,0.4)"/>
+  <text x="400" y="480" font-family="Arial, sans-serif" font-size="20" fill="rgba(255,255,255,0.6)" text-anchor="middle" font-weight="600" letter-spacing="4">D E S K H U B</text>
+</svg>

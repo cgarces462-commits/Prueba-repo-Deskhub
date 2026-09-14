@@ -24,9 +24,9 @@ async function cambiarRol(id, nombreRol) {
 }
 
 async function cambiarEstado(id, activo) {
-  const actualizado = await userRepository.updateById(id, { activo: Boolean(activo) });
-  if (!actualizado) throw new HttpError(404, 'Usuario no encontrado');
-  return userRepository.findById(id);
+  const usuario = await userRepository.findById(id);
+  if (!usuario) throw new HttpError(404, 'Usuario no encontrado');
+  return userRepository.updateById(id, { activo: Boolean(activo) });
 }
 
 async function eliminar(id) {
