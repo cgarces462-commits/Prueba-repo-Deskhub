@@ -1,0 +1,9 @@
+node_modules
+.env
+*.log
+.DS_Store
+.claude
+frontend/dist
+Backend/.mysql
+uploads/*
+!uploads/.gitkeep
