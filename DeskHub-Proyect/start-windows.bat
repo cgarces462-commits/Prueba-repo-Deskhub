@@ -84,8 +84,24 @@ if %errorlevel%==0 (
 echo [OK]  Base de datos 'deskhub' asegurada
 
 rem ---------- 3) Backend\.env ----------
-echo [..]  Configurando Backend\.env
-powershell -NoProfile -Command "$p='%BACKEND%\.env'; $ok=Test-Path $p; $e='%BACKEND%\.env.example'; if(-not $ok){ $p=$e }; (Get-Content $p -Raw) -replace '(?m)^DB_HOST=.*$','DB_HOST=127.0.0.1' -replace '(?m)^DB_PORT=.*$','DB_PORT=%PORT_DB%' | Set-Content '%BACKEND%\.env' -NoNewline"
+rem Si existe pero apunta al puerto viejo (3307), se regenera
+findstr /i "DB_PORT=3307" "%BACKEND%\.env" >nul 2>&1 && goto crear_env
+if exist "%BACKEND%\.env" goto env_listo
+:crear_env
+echo [..]  Creando Backend\.env
+(
+echo PORT=3000
+echo DB_HOST=127.0.0.1
+echo DB_PORT=%PORT_DB%
+echo DB_NAME=deskhub
+echo DB_USER=root
+echo DB_PASSWORD=
+echo JWT_SECRET=cambia_esta_clave_por_una_segura
+echo JWT_EXPIRES_IN=8h
+echo CORS_ORIGIN=http://localhost:5173
+) > "%BACKEND%\.env"
+:env_listo
+echo [OK]  Backend\.env configurado
 
 rem ---------- 4) Dependencias ----------
 if not exist "%BACKEND%\node_modules" (
@@ -113,7 +129,7 @@ if %errorlevel%==0 (
     echo [OK]  Backend ya esta corriendo
 ) else (
     echo [..]  Levantando backend ^(puerto 3000^)
-    start "DeskHub Backend" /min cmd /c "cd /d %BACKEND% && node index.js > %RAIZ%.backend.log 2>&1"
+    start "" /min "%RAIZ%run-backend.bat"
 )
 
 rem ---------- 7) Frontend ----------
@@ -122,7 +138,7 @@ if %errorlevel%==0 (
     echo [OK]  Frontend ya esta corriendo
 ) else (
     echo [..]  Levantando frontend ^(puerto 5173^)
-    start "DeskHub Frontend" /min cmd /c "cd /d %FRONTEND% && node node_modules\vite\bin\vite.js > %RAIZ%.frontend.log 2>&1"
+    start "" /min "%RAIZ%run-frontend.bat"
 )
 
 echo.
