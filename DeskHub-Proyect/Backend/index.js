@@ -3,9 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 
-const routes = require('./src/routes');
-const { sequelize } = require('./src/models');
-const { manejadorErrores, rutaNoEncontrada } = require('./src/middlewares/error.middleware');
+const routes = require('./src/routes/RutasIndex');
+const { sequelize } = require('./src/models/ModelosIndex');
+const { manejadorErrores, rutaNoEncontrada } = require('./src/middlewares/ErrorMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 3000;

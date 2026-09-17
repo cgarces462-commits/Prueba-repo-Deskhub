@@ -14,8 +14,17 @@
 Proyect-Deskhub/
 ├── Backend/              API REST (Express + Sequelize + MySQL)
 ├── frontend/             Interfaz web (React + Vite)
-├── Imagenes-Prueba/      Logos de ejemplo
-├── start.sh              Arranque del proyecto en un comando
+│   └── public/           Estáticos: logo.png (en uso), logo4.jpg, images/
+├── Imagenes-Prueba/      Logos/imágenes de ejemplo (material fuente)
+├── scripts/
+│   ├── linux/
+│   │   └── start.sh      Arranque en Linux (MySQL/MariaDB embebido)
+│   └── windows/
+│       ├── start-xampp.bat   Arranque en Windows (XAMPP)
+│       ├── start-wamp.bat    Arranque en Windows (WAMP)
+│       ├── run-backend.bat   Arranque manual del backend
+│       ├── run-frontend.bat  Arranque manual del frontend
+│       └── diagnostico-frontend.bat  Diagnóstico del frontend
 └── GUIA-PROYECTO.md      Este archivo
 ```
 
@@ -26,17 +35,26 @@ Proyect-Deskhub/
 ### 3.0 Forma rápida (recomendada)
 
 El proyecto ya incluye un script que levanta todo automáticamente
-(MySQL 🐬 + seed + backend + frontend):
+(MySQL 🐬 + seed + backend + frontend). Elige según tu sistema:
 
 ```bash
+# Linux: usa el MySQL/MariaDB embebido del proyecto
 cd DeskHub-Proyect
-./start.sh
+./scripts/linux/start.sh
+```
+
+```bat
+:: Windows con WAMP instalado
+scripts\windows\start-wamp.bat
+
+:: Windows con XAMPP instalado
+scripts\windows\start-xampp.bat
 ```
 
 Luego abre **http://localhost:5173**.
 
-> El script es idempotente: si MySQL, el backend o el frontend ya están
-> corriendo, no los duplica. Los logs quedan en `.backend.log` y `.frontend.log`.
+> Los scripts son idempotentes: si MySQL, el backend o el frontend ya están
+> corriendo, no los duplican. Los logs quedan en `.backend.log` y `.frontend.log`.
 
 ### 3.1 Base de datos
 
@@ -109,7 +127,7 @@ Abrir **http://localhost:5173** en el navegador.
 | 1 | Login con correo y contraseña (inputs controlados) | `frontend/src/components/LoginForm.jsx` | 8 (useState form), 49-68 (Campo value/onChange) |
 | 2 | No permite campos vacíos | `frontend/src/utils/validacion.js` | 9-15 (`validarLogin`) |
 | 3 | Valida formato de correo electrónico | `frontend/src/utils/validacion.js` | 1-7 (`RE_EMAIL`) |
-| 4 | Error claro si correo o contraseña no coinciden | `Backend/src/services/auth.service.js` | 56, 66 ("Credenciales inválidas") |
+| 4 | Error claro si correo o contraseña no coinciden | `Backend/src/services/AuthService.js` | 56, 66 ("Credenciales inválidas") |
 |   | Se muestra en el formulario | `frontend/src/components/LoginForm.jsx` | 33, 45 |
 | 5 | Botón deshabilitado + "Ingresando..." | `frontend/src/components/LoginForm.jsx` | 35, 71-72 |
 | 6 | Redirige a pantalla principal tras login | `frontend/src/App.jsx` | 30-34 (`onLogin` → `setVista('inicio')`) |
@@ -121,7 +139,7 @@ Abrir **http://localhost:5173** en el navegador.
 | # | Criterio | Archivo | Línea(s) |
 |---|----------|---------|----------|
 | 7 | Nombre, correo, contraseña, confirmar | `frontend/src/components/RegistroForm.jsx` | 8-15, 60-115 |
-| 8 | Correo ya registrado | `Backend/src/services/auth.service.js` | 24-27 (HTTP 409) |
+| 8 | Correo ya registrado | `Backend/src/services/AuthService.js` | 24-27 (HTTP 409) |
 |   | Se muestra en el formulario | `frontend/src/components/RegistroForm.jsx` | 45, 56 |
 | 9 | Longitud mínima de contraseña (≥ 6) | `frontend/src/utils/validacion.js` | 24-26 |
 | 10 | Contraseña y confirmación coinciden | `frontend/src/utils/validacion.js` | 27-29 |
@@ -175,8 +193,8 @@ Abrir **http://localhost:5173** en el navegador.
 | 28 | Roles definidos con claridad (5 roles) | `frontend/src/utils/roles.js:1-7` · `Backend/src/config/roles.js` (con descripción) |
 | 29 | Rol guardado en la sesión al login | `frontend/src/services/api.js:21-24` (`guardarSesion`) · Sesión leída en `App.jsx:13` |
 | 30 | UI muestra/oculta opciones según rol | `Navbar.jsx:19-21` (tab Usuarios) · `EspaciosList.jsx:107,197,207` (CRUD) · `ReservasList.jsx:251-273` (staff vs cliente) · `Dashboard.jsx:96-108` (tarjetas diferentes) |
-| 31 | Acciones sensibles protegidas por rol | Backend: `auth.middleware.js:29-41` (`autorizar`) usado en `space.routes.js`, `user.routes.js`, `reservation.routes.js` |
-| 32 | Mensaje claro si usuario intenta acción sin permisos | `auth.middleware.js:35-37` → 403 "No tienes permisos suficientes..." · Frontend lo muestra en `EspaciosList.jsx:87`, `ReservasList.jsx:105`, `UsuariosList.jsx:45-47` |
+| 31 | Acciones sensibles protegidas por rol | Backend: `AuthMiddleware.js:29-41` (`autorizar`) usado en `EspacioRoutes.js`, `UsuarioRoutes.js`, `ReservaRoutes.js` |
+| 32 | Mensaje claro si usuario intenta acción sin permisos | `AuthMiddleware.js:35-37` → 403 "No tienes permisos suficientes..." · Frontend lo muestra en `EspaciosList.jsx:87`, `ReservasList.jsx:105`, `UsuariosList.jsx:45-47` |
 
 ---
 
@@ -194,11 +212,17 @@ Abrir **http://localhost:5173** en el navegador.
 
 ## 6. Scripts útiles
 
-| Comando                          | Dónde    | Qué hace                              |
-|----------------------------------|----------|---------------------------------------|
-| `npm run dev`                    | Backend  | Inicia con nodemon (auto-reload)      |
-| `npm start`                      | Backend  | Inicia en producción (node)           |
-| `npm run seed`                   | Backend  | Semilla: roles + super_admin + prueba |
-| `npm run dev`                    | Frontend | Inicia Vite con HMR                   |
-| `npm run build`                  | Frontend | Compila producción                    |
-| `npm run lint`                   | Frontend | Linting con oxlint                    |
+| Comando                              | Dónde                 | Qué hace                              |
+|--------------------------------------|-----------------------|---------------------------------------|
+| `./scripts/linux/start.sh`           | scripts/linux         | Linux: levanta MySQL embebido + seed + backend + frontend |
+| `scripts\windows\start-wamp.bat`     | scripts/windows       | Windows con WAMP                      |
+| `scripts\windows\start-xampp.bat`    | scripts/windows       | Windows con XAMPP (MySQL en puerto 3306) |
+| `scripts\windows\run-backend.bat`    | scripts/windows       | Windows: arranca solo el backend      |
+| `scripts\windows\run-frontend.bat`   | scripts/windows       | Windows: arranca solo el frontend     |
+| `scripts\windows\diagnostico-frontend.bat` | scripts/windows | Windows: diagnostica el frontend      |
+| `npm run dev`                        | Backend               | Inicia con nodemon (auto-reload)      |
+| `npm start`                          | Backend               | Inicia en producción (node)           |
+| `npm run seed`                       | Backend               | Semilla: roles + super_admin + prueba |
+| `npm run dev`                        | Frontend              | Inicia Vite con HMR                   |
+| `npm run build`                      | Frontend              | Compila producción                    |
+| `npm run lint`                       | Frontend              | Linting con oxlint                    |

@@ -1,0 +1,38 @@
+const usuarioRepository = require('../repositories/UsuarioRepository');
+const rolRepository = require('../repositories/RolRepository');
+const { HttpError } = require('./AuthService');
+const { ROLES_LIST } = require('../config/roles');
+
+async function listar() {
+  return usuarioRepository.findAll();
+}
+
+async function obtenerPorId(id) {
+  const usuario = await usuarioRepository.findById(id);
+  if (!usuario) throw new HttpError(404, 'Usuario no encontrado');
+  return usuario;
+}
+
+async function cambiarRol(id, nombreRol) {
+  if (!ROLES_LIST.includes(nombreRol)) {
+    throw new HttpError(400, `Rol inválido. Roles válidos: ${ROLES_LIST.join(', ')}`);
+  }
+  const rol = await rolRepository.findByNombre(nombreRol);
+  const actualizado = await usuarioRepository.updateById(id, { roleId: rol.id });
+  if (!actualizado) throw new HttpError(404, 'Usuario no encontrado');
+  return usuarioRepository.findById(id);
+}
+
+async function cambiarEstado(id, activo) {
+  const usuario = await usuarioRepository.findById(id);
+  if (!usuario) throw new HttpError(404, 'Usuario no encontrado');
+  return usuarioRepository.updateById(id, { activo: Boolean(activo) });
+}
+
+async function eliminar(id) {
+  const eliminado = await usuarioRepository.deleteById(id);
+  if (!eliminado) throw new HttpError(404, 'Usuario no encontrado');
+  return eliminado;
+}
+
+module.exports = { listar, obtenerPorId, cambiarRol, cambiarEstado, eliminar };

@@ -1,11 +1,11 @@
 require('dotenv').config();
-const { sequelize, Role, User } = require('../models');
+const { sequelize, RolModel, UsuarioModel } = require('../models/ModelosIndex');
 const { ROLES, ROLES_DESCRIPCION } = require('../config/roles');
 const { hashPassword } = require('../utils/password.util');
 
 async function seedRoles() {
   for (const nombre of Object.values(ROLES)) {
-    await Role.findOrCreate({
+    await RolModel.findOrCreate({
       where: { nombre },
       defaults: { descripcion: ROLES_DESCRIPCION[nombre] },
     });
@@ -14,16 +14,16 @@ async function seedRoles() {
 }
 
 async function seedSuperAdmin() {
-  const superAdminRole = await Role.findOne({
+  const superAdminRole = await RolModel.findOne({
     where: { nombre: ROLES.SUPER_ADMIN },
   });
 
-  const existente = await User.findOne({
+  const existente = await UsuarioModel.findOne({
     where: { email: 'superadmin@deskhub.com' },
   });
 
   if (!existente) {
-    await User.create({
+    await UsuarioModel.create({
       nombre: 'Super',
       apellido: 'Admin',
       email: 'superadmin@deskhub.com',
@@ -71,17 +71,17 @@ const USUARIOS_PRUEBA = [
 
 async function seedUsuariosPrueba() {
   for (const datos of USUARIOS_PRUEBA) {
-    const existente = await User.findOne({ where: { email: datos.email } });
+    const existente = await UsuarioModel.findOne({ where: { email: datos.email } });
     if (existente) {
       console.log(`ℹ ${datos.email} ya existía, no se duplicó.`);
       continue;
     }
-    const rol = await Role.findOne({ where: { nombre: datos.rol } });
+    const rol = await RolModel.findOne({ where: { nombre: datos.rol } });
     if (!rol) {
       console.log(`✘ Rol ${datos.rol} no encontrado, se omite ${datos.email}.`);
       continue;
     }
-    await User.create({
+    await UsuarioModel.create({
       nombre: datos.nombre,
       apellido: datos.apellido,
       email: datos.email,
